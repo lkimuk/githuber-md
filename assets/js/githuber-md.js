@@ -52,30 +52,6 @@ function githuber_md_render_katex(container) {
                 });
             };
 
-            var markedRenderer = editormd.markedRenderer;
-
-            editormd.markedRenderer = function(markdownToC, options) {
-                var renderer = markedRenderer.call(this, markdownToC, options);
-                var paragraph = renderer.paragraph;
-                var code = renderer.code;
-                var dollarPlaceholder = 'GITHUBERMDKATEXDOLLAR';
-
-                renderer.paragraph = function(text) {
-                    var html = paragraph.call(this, text.split('$').join(dollarPlaceholder));
-
-                    return html.split(dollarPlaceholder).join('$');
-                };
-
-                renderer.code = function(codeText, lang, escaped) {
-                    if (lang === 'katex' || lang === 'latex') {
-                        return marked.Renderer.prototype.code.call(this, codeText, lang, escaped);
-                    }
-
-                    return code.call(this, codeText, lang, escaped);
-                };
-
-                return renderer;
-            };
         }
 
         global_editormd_config = {
@@ -92,6 +68,7 @@ function githuber_md_render_katex(container) {
             tocContainer: (config.support_toc === 'yes') ? '' : false,
             emoji: (config.support_emojify === 'yes'),
             tex: (config.support_katex === 'yes'),
+            texAutoRender: (config.support_katex === 'yes'),
             mathJax: (config.support_mathjax === 'yes'),
             flowChart: (config.support_flowchart === 'yes'),
             sequenceDiagram: (config.support_sequence_diagram === 'yes'),

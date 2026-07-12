@@ -275,7 +275,7 @@ class Markdown extends ControllerAbstract {
 		if ( 'no' === $markdown_this_post || ! $this->markdown_this_post ) {
 
 		} else {
-			wp_enqueue_script( 'editormd', $this->githuber_plugin_url . 'assets/vendor/editor.md/editormd.min.js', array( 'jquery' ), $this->editormd_varsion, true );
+			wp_enqueue_script( 'editormd', $this->githuber_plugin_url . 'assets/vendor/editor.md/editormd.js', array( 'jquery' ), $this->editormd_varsion, true );
 			wp_enqueue_script( 'githuber-md', $this->githuber_plugin_url . 'assets/js/githuber-md.js', array( 'editormd' ), $this->version, true );
 
 			switch ( get_bloginfo( 'language' ) ) {

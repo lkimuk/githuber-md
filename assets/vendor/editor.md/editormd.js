@@ -174,6 +174,7 @@
                                                // Support FontAwesome icon emoji :fa-xxx: > Using fontAwesome icon web fonts;
                                                // Support Editor.md logo icon emoji :editormd-logo: :editormd-logo-1x: > 1~8x;
         tex                  : false,          // TeX(LaTeX), based on KaTeX
+        texAutoRender        : false,          // Preserve math delimiters for KaTeX auto-render
         flowChart            : false,          // flowChart.js only support IE9+
         sequenceDiagram      : false,          // sequenceDiagram.js only support IE9+
         previewCodeHighlight : true,
@@ -2107,6 +2108,7 @@
                 taskList             : settings.taskList,
                 emoji                : settings.emoji,
                 tex                  : settings.tex,
+                texAutoRender        : settings.texAutoRender,
                 atLink               : settings.atLink,           // for @link
                 emailLink            : settings.emailLink,        // for mail address auto link
                 flowChart            : settings.flowChart,
@@ -3519,6 +3521,7 @@
             taskList             : false,          // Enable Github Flavored Markdown task lists
             emoji                : false,          // :emoji: , Support Twemoji, fontAwesome, Editor.md logo emojis.
             tex                  : false,          // TeX(LaTeX), based on KaTeX
+            texAutoRender        : false,          // Preserve math delimiters for KaTeX auto-render
             flowChart            : false,          // flowChart.js only support IE9+
             mermaid              : false,
             mathJax              : false,
@@ -3723,8 +3726,8 @@
         };
 
         markedRenderer.paragraph = function(text) {
-            var isTeXInline     = /\$\$(.*)\$\$/g.test(text);
-            var isTeXLine       = /^\$\$(.*)\$\$$/.test(text);
+            var isTeXInline     = !settings.texAutoRender && /\$\$(.*)\$\$/g.test(text);
+            var isTeXLine       = !settings.texAutoRender && /^\$\$(.*)\$\$$/.test(text);
             var isTeXAddClass   = (isTeXLine)     ? " class=\"" + editormd.classNames.tex + "\"" : "";
             var isToC           = (settings.tocm) ? /^(\[TOC\]|\[TOCM\])$/.test(text) : /^\[TOC\]$/.test(text);
             var isToCMenu       = /^\[TOCM\]$/.test(text);
@@ -3756,7 +3759,7 @@
                 return "<div class=\"mermaid\">" + code + "</div>";
             } else if (lang === "mathjax") {
                 return "<div class=\"mathjax\">$$\n" + code + "\n$$</div>";
-            } else if (lang === "latex" || lang === "katex") {
+            } else if (!settings.texAutoRender && (lang === "latex" || lang === "katex")) {
                 return "<p class=\"" + editormd.classNames.tex + "\">" + code + "</p>";
             } else {
                 return marked.Renderer.prototype.code.apply(this, arguments);
