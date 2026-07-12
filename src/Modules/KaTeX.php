@@ -203,6 +203,7 @@ class KaTeX extends ModuleAbstract {
 	public static function restore_math_markup( $content, $expressions ) {
 		foreach ( $expressions as $index => $expression ) {
 			$token      = 'GITHUBERMDMATHEXPRESSION' . $index . 'TOKEN';
+			$expression = str_replace( array( "\r\n", "\r", "\n" ), ' ', $expression );
 			$expression = htmlspecialchars( $expression, ENT_NOQUOTES, 'UTF-8' );
 			$content    = str_replace( $token, $expression, $content );
 		}
