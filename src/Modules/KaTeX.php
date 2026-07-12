@@ -145,4 +145,86 @@ class KaTeX extends ModuleAbstract {
 		echo preg_replace( '/\s+/', ' ', $script );
 	}
 
+	/**
+	 * Protect math expressions from Markdown backslash escaping.
+	 *
+	 * @param string $content Markdown content.
+	 * @return array
+	 */
+	public static function protect_math_markup( $content ) {
+		$expressions = array();
+		$output      = '';
+		$index       = 0;
+		$length      = strlen( $content );
+
+		while ( $index < $length ) {
+			if ( '$' !== $content[ $index ] || self::is_escaped( $content, $index ) ) {
+				$output .= $content[ $index ];
+				$index++;
+				continue;
+			}
+
+			$delimiter        = '$$' === substr( $content, $index, 2 ) ? '$$' : '$';
+			$delimiter_length = strlen( $delimiter );
+			$end              = $index + $delimiter_length;
+
+			while ( $end < $length ) {
+				if ( $delimiter === substr( $content, $end, $delimiter_length ) && ! self::is_escaped( $content, $end ) ) {
+					break;
+				}
+				$end++;
+			}
+
+			if ( $end >= $length ) {
+				$output .= $content[ $index ];
+				$index++;
+				continue;
+			}
+
+			$token         = 'GITHUBERMDMATHEXPRESSION' . count( $expressions ) . 'TOKEN';
+			$expressions[] = substr( $content, $index, $end + $delimiter_length - $index );
+			$output       .= $token;
+			$index         = $end + $delimiter_length;
+		}
+
+		return array(
+			'content'     => $output,
+			'expressions' => $expressions,
+		);
+	}
+
+	/**
+	 * Restore protected math expressions to transformed HTML.
+	 *
+	 * @param string $content     Transformed HTML.
+	 * @param array  $expressions Protected math expressions.
+	 * @return string
+	 */
+	public static function restore_math_markup( $content, $expressions ) {
+		foreach ( $expressions as $index => $expression ) {
+			$token      = 'GITHUBERMDMATHEXPRESSION' . $index . 'TOKEN';
+			$expression = htmlspecialchars( $expression, ENT_NOQUOTES, 'UTF-8' );
+			$content    = str_replace( $token, $expression, $content );
+		}
+
+		return $content;
+	}
+
+	/**
+	 * Check whether a character is escaped by a backslash.
+	 *
+	 * @param string  $content Content to inspect.
+	 * @param integer $index   Character position.
+	 * @return boolean
+	 */
+	private static function is_escaped( $content, $index ) {
+		$backslashes = 0;
+
+		while ( $index > 0 && '\\' === $content[ --$index ] ) {
+			$backslashes++;
+		}
+
+		return 1 === $backslashes % 2;
+	}
+
 }

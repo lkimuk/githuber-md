@@ -953,8 +953,18 @@ class Markdown extends ControllerAbstract {
 			$text = $this->restore_code_blocks( $text );
 		}
 
+		$katex_math = null;
+		if ( $this->is_support_katex ) {
+			$katex_math = Module\KaTeX::protect_math_markup( $text );
+			$text       = $katex_math['content'];
+		}
+
 		// Transform it!
 		$text = $this->get_parser()->transform( $text );
+
+		if ( ! empty( $katex_math ) ) {
+			$text = Module\KaTeX::restore_math_markup( $text, $katex_math['expressions'] );
+		}
 
 		// Fetch remote images.
 		if ( $this->is_convert_remote_image() ) {
