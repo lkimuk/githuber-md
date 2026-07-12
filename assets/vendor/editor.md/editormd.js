@@ -2127,14 +2127,26 @@
                 smartLists  : true,
                 smartypants : true
             };
-            
+
             marked.setOptions(markedOptions);
-                    
-            var newMarkdownDoc = editormd.$marked(cmValue, markedOptions);
+
+            var markdownSource = cmValue;
+            var mathProtection = null;
+
+            if (settings.texAutoRender && typeof githuber_md_protect_math === "function") {
+                mathProtection = githuber_md_protect_math(markdownSource);
+                markdownSource = mathProtection.markdown;
+            }
+
+            var newMarkdownDoc = editormd.$marked(markdownSource, markedOptions);
             
             //console.info("cmValue", cmValue, newMarkdownDoc);
             
             newMarkdownDoc = editormd.filterHTMLTags(newMarkdownDoc, settings.htmlDecode);
+
+            if (mathProtection && typeof githuber_md_restore_math === "function") {
+                newMarkdownDoc = githuber_md_restore_math(newMarkdownDoc, mathProtection.expressions);
+            }
             
             //console.error("cmValue", cmValue, newMarkdownDoc);
             

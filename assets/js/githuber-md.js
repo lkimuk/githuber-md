@@ -9,6 +9,63 @@ var is_support_html_figure = false;
 var spellcheck_dictionary_dir = '';
 var spellcheck_lang = 'en_US';
 
+function githuber_md_protect_math(markdown) {
+    var expressions = [];
+    var output = '';
+    var index = 0;
+
+    while (index < markdown.length) {
+        var delimiter = markdown.substr(index, 2) === '$$' ? '$$' : '$';
+
+        if (markdown.charAt(index) !== '$' || githuber_md_is_escaped(markdown, index)) {
+            output += markdown.charAt(index++);
+            continue;
+        }
+
+        var end = index + delimiter.length;
+        while (end < markdown.length) {
+            if (markdown.substr(end, delimiter.length) === delimiter && !githuber_md_is_escaped(markdown, end)) {
+                break;
+            }
+            end++;
+        }
+
+        if (end >= markdown.length) {
+            output += markdown.charAt(index++);
+            continue;
+        }
+
+        var token = 'GITHUBERMDMATHEXPRESSION' + expressions.length + 'TOKEN';
+        expressions.push(markdown.substring(index, end + delimiter.length));
+        output += token;
+        index = end + delimiter.length;
+    }
+
+    return {markdown: output, expressions: expressions};
+}
+
+function githuber_md_is_escaped(text, index) {
+    var backslashes = 0;
+    while (index > 0 && text.charAt(--index) === '\\') {
+        backslashes++;
+    }
+    return backslashes % 2 === 1;
+}
+
+function githuber_md_restore_math(html, expressions) {
+    expressions.forEach(function(expression, index) {
+        var token = 'GITHUBERMDMATHEXPRESSION' + index + 'TOKEN';
+        var escapedExpression = expression
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        html = html.split(token).join(escapedExpression);
+    });
+
+    return html;
+}
+
 function githuber_md_render_katex(container) {
     if (typeof renderMathInElement === 'undefined' || typeof container === 'undefined' || !container) {
         return;
