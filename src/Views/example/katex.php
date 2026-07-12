@@ -12,21 +12,20 @@ if ( ! defined('GITHUBER_PLUGIN_NAME') ) die;
  */
 ?>
 
-<p class="description"><?php echo __( 'KaTeX block:', 'wp-githuber-md' ); ?></p>
+<p class="description"><?php echo __( 'KaTeX display:', 'wp-githuber-md' ); ?></p>
 
 <pre class="prettyprint setting-example">
 <code class="language-markdown">
-```katex
+$$
 f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi
-```
+$$
 </code>
 </pre>
-<p class="description"><?php echo __( 'Block identification code:', 'wp-githuber-md' ); ?> <span class="example-tag">katax</span></p>
 <p class="description"><?php echo __( 'KaTeX inline:', 'wp-githuber-md' ); ?></p>
 
 <pre class="prettyprint setting-example">
 <code class="language-markdown">
-`$$ f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi $$`
+$f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi$
 </code>
 </pre>
 

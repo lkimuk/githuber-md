@@ -22,26 +22,6 @@ if ( ! defined('GITHUBER_PLUGIN_NAME') ) die;
     }
 <?php endif; ?>
 
-<?php if ( 'yes' === githuber_get_option( 'support_katex', 'githuber_modules' ) ) : ?>
-    .katex-container {
-        margin: 25px !important;
-        text-align: center;
-    }
-    .katex-container.katex-inline {
-        display: inline-block !important;
-        background: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    pre .katex-container {
-        font-size: 1.4em !important;
-    }
-    .katex-inline {
-        background: none !important;
-        margin: 0 3px;
-    }
-<?php endif; ?>
-
 <?php if ( '_blank' === githuber_get_option( 'post_link_target_attribute', 'githuber_preferences' ) ) : ?>
     code.kb-btn {
         display: inline-block;

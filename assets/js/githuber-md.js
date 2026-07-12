@@ -9,6 +9,21 @@ var is_support_html_figure = false;
 var spellcheck_dictionary_dir = '';
 var spellcheck_lang = 'en_US';
 
+function githuber_md_render_katex(container) {
+    if (typeof renderMathInElement === 'undefined' || typeof container === 'undefined' || !container) {
+        return;
+    }
+
+    renderMathInElement(container, {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+        ],
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+        throwOnError: false
+    });
+}
+
 (function($) {
     $(function() {
         var config = window.editormd_config;
@@ -18,6 +33,50 @@ var spellcheck_lang = 'en_US';
 
         is_support_inline_keyboard_style = (config.support_inline_code_keyboard_style === 'yes');
         is_support_html_figure = (config.support_html_figure === 'yes');
+
+        if (config.support_katex === 'yes' && typeof editormd !== 'undefined') {
+            editormd.loadKaTeX = function(callback) {
+                var loadPath = config.editor_modules_url;
+                callback = callback || function() {};
+
+                editormd.loadCSS(loadPath + '../../katex/katex.min', function() {
+                    editormd.loadScript(loadPath + '../../katex/katex.min', function() {
+                        editormd.loadScript(loadPath + '../../katex/contrib/auto-render.min', function() {
+                            callback();
+
+                            if (typeof githuber_md_editor !== 'undefined' && githuber_md_editor.previewContainer) {
+                                githuber_md_render_katex(githuber_md_editor.previewContainer[0]);
+                            }
+                        });
+                    });
+                });
+            };
+
+            var markedRenderer = editormd.markedRenderer;
+
+            editormd.markedRenderer = function(markdownToC, options) {
+                var renderer = markedRenderer.call(this, markdownToC, options);
+                var paragraph = renderer.paragraph;
+                var code = renderer.code;
+                var dollarPlaceholder = 'GITHUBERMDKATEXDOLLAR';
+
+                renderer.paragraph = function(text) {
+                    var html = paragraph.call(this, text.split('$').join(dollarPlaceholder));
+
+                    return html.split(dollarPlaceholder).join('$');
+                };
+
+                renderer.code = function(codeText, lang, escaped) {
+                    if (lang === 'katex' || lang === 'latex') {
+                        return marked.Renderer.prototype.code.call(this, codeText, lang, escaped);
+                    }
+
+                    return code.call(this, codeText, lang, escaped);
+                };
+
+                return renderer;
+            };
+        }
 
         global_editormd_config = {
             width: '100%',
@@ -70,6 +129,18 @@ var spellcheck_lang = 'en_US';
                     'z-index': 'auto'
                 });
                 reload_githuber_md();
+            },
+
+            onload: function() {
+                githuber_md_render_katex(this.previewContainer[0]);
+            },
+
+            onchange: function() {
+                githuber_md_render_katex(this.previewContainer[0]);
+            },
+
+            onpreviewing: function() {
+                githuber_md_render_katex(this.previewContainer[0]);
             },
 
             toolbarIconsClass: {

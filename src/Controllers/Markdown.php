@@ -476,18 +476,14 @@ class Markdown extends ControllerAbstract {
 					$is_mermaid = true;
 				}
 
-				if ( 'katex' === $match ) {
-					$is_katex = true;
-				}
-
 				if ( 'mathjax' === $match ) {
 					$is_mathjax = true;
 				}
 			}
 		} 
 		
-		// If we find inline KaTex syntax.
-		if ( strpos( $post_content, '<code class="katex-inline">' ) !== false ) {
+		// If we find KaTeX delimiters.
+		if ( strpos( $post_content, '$' ) !== false ) {
 			$is_katex = true;
 		}
 
@@ -968,11 +964,6 @@ class Markdown extends ControllerAbstract {
 		// Render Github Flavored Markdown task lists if this module is enabled.
 		if ( $this->is_support_task_list ) {
 			$text = Module\TaskList::parse_gfm_task_list( $text );
-		}
-
-		// Render KaTeX inline markup.
-		if ( $this->is_support_katex ) {
-			$text = Module\KaTeX::katex_inline_markup( $text );
 		}
 
 		// Render MathJax inline markup.

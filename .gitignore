@@ -5,3 +5,9 @@ tests
 bin
 .vscode
 vendor/
+deploy/
+!assets/vendor/
+!assets/vendor/katex/
+!assets/vendor/katex/contrib/
+!assets/vendor/katex/contrib/auto-render.js
+!assets/vendor/katex/contrib/auto-render.min.js
